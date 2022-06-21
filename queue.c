@@ -228,7 +228,7 @@ void q_reverse(struct list_head *head)
     }
     // Reverse list
     struct list_head *n = head->prev;
-    struct list_head *n_prev = n->prev;
+    struct list_head *n_prev;
     while (n != head) {
         n_prev = n->prev;
         n->prev = n->next;
@@ -239,75 +239,6 @@ void q_reverse(struct list_head *head)
     n_prev = head->prev;
     head->prev = head->next;
     head->next = n_prev;
-}
-
-/* Sort elements of queue in ascending order */
-void q_sort(struct list_head *head)
-{
-    if (!head || list_empty(head)) {
-        return;
-    }
-    if (head->next == head->prev) {
-        return;
-    }
-    struct list_head *start_node = head->next;
-    struct list_head *end_node = head->prev;
-    end_node->next = NULL;
-
-    head->next = mergesort(start_node, end_node);
-
-    for (start_node = head; start_node->next != NULL;
-         start_node = start_node->next) {
-        start_node->next->prev = start_node;
-    }
-    start_node->next = head;
-    head->prev = start_node;
-}
-
-/* Swap two nodes */
-void swap_node(struct list_head *n1, struct list_head *n2)
-{
-    struct list_head *n1_prev = n1->prev;
-    if (n1->next != n2) {
-        list_del(n1);
-        list_add(n1, n2);
-        list_del(n2);
-        list_add(n2, n1_prev);
-    } else {
-        list_del(n1);
-        list_add(n1, n2);
-    }
-}
-
-void swap_element_value(element_t *a, element_t *b)
-{
-    char *tmp = a->value;
-    a->value = b->value;
-    b->value = tmp;
-}
-
-void quicksort(struct list_head *node_l, struct list_head *node_r)
-{
-    if ((node_l != node_r) && (node_r->next != node_l)) {
-        char *pivot = list_entry(node_r, element_t, list)->value;
-        struct list_head *idx = node_l->prev;
-        for (struct list_head *node = node_l; node != node_r;
-             node = node->next) {
-            if (strcmp(list_entry(node, element_t, list)->value, pivot) <= 0) {
-                idx = idx->next;
-                // swap_node(idx, node);
-                swap_element_value(list_entry(idx, element_t, list),
-                                   list_entry(node, element_t, list));
-            }
-        }
-        idx = idx->next;
-        // swap_node(idx, node_r);
-        swap_element_value(list_entry(idx, element_t, list),
-                           list_entry(node_r, element_t, list));
-
-        quicksort(node_l, idx->prev);
-        quicksort(idx->next, node_r);
-    }
 }
 
 struct list_head *mergesort(struct list_head *lnode, struct list_head *rnode)
@@ -343,4 +274,73 @@ struct list_head *mergesort(struct list_head *lnode, struct list_head *rnode)
 
     return ms_head;
 
+}
+
+/* Sort elements of queue in ascending order */
+void q_sort(struct list_head *head)
+{
+    if (!head || list_empty(head)) {
+        return;
+    }
+    if (head->next == head->prev) {
+        return;
+    }
+    struct list_head *start_node = head->next;
+    struct list_head *end_node = head->prev;
+    end_node->next = NULL;
+
+    head->next = mergesort(start_node, end_node);
+
+    for (start_node = head; start_node->next != NULL;
+         start_node = start_node->next) {
+        start_node->next->prev = start_node;
+    }
+    start_node->next = head;
+    head->prev = start_node;
+}
+
+// /* Swap two nodes */
+// void swap_node(struct list_head *n1, struct list_head *n2)
+// {
+//     struct list_head *n1_prev = n1->prev;
+//     if (n1->next != n2) {
+//         list_del(n1);
+//         list_add(n1, n2);
+//         list_del(n2);
+//         list_add(n2, n1_prev);
+//     } else {
+//         list_del(n1);
+//         list_add(n1, n2);
+//     }
+// }
+
+void swap_element_value(element_t *a, element_t *b)
+{
+    char *tmp = a->value;
+    a->value = b->value;
+    b->value = tmp;
+}
+
+void quicksort(struct list_head *node_l, struct list_head *node_r)
+{
+    if ((node_l != node_r) && (node_r->next != node_l)) {
+        char *pivot = list_entry(node_r, element_t, list)->value;
+        struct list_head *idx = node_l->prev;
+        for (struct list_head *node = node_l; node != node_r;
+             node = node->next) {
+            if (strcmp(list_entry(node, element_t, list)->value, pivot) <= 0) {
+                idx = idx->next;
+                // swap_node(idx, node);
+                swap_element_value(list_entry(idx, element_t, list),
+                                   list_entry(node, element_t, list));
+            }
+        }
+        idx = idx->next;
+        // swap_node(idx, node_r);
+        swap_element_value(list_entry(idx, element_t, list),
+                           list_entry(node_r, element_t, list));
+
+        quicksort(node_l, idx->prev);
+        quicksort(idx->next, node_r);
+    }
 }
